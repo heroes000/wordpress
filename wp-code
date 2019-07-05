@@ -1,0 +1,146 @@
+*******
+Function.php
+*********
+
+/**
+ * Enqueue scripts and styles.
+ */
+function fragrance_scripts() {
+	wp_enqueue_script( 'fragrance-bootstrap.min', get_template_directory_uri() . '/libs/bootstrap/js/bootstrap.min.js', array(), '1.0', false);
+}
+add_action( 'wp_enqueue_scripts', 'fragrance_scripts' );
+
+function fragrance_style() {
+	wp_enqueue_style( 'fragrance-bootstrap-4', get_template_directory_uri().'/libs/bootstrap-4.0.0/css/bootstrap.css', array(), 'v4.0.0', 'all' );
+}
+add_action( 'wp_enqueue_scripts', 'fragrance_style' );
+
+/* JQuery */
+add_action( 'wp_enqueue_scripts', 'my_scripts_method' );
+	function my_scripts_method(){
+		wp_enqueue_script( 'jquery' );
+}
+
+add_action( 'init', 'fragrance_setup' );
+function fragrance_setup() {
+	
+	/*-- Menu --*/
+	register_nav_menus( array(
+		'top' => 'Header menu',
+		'footer' => 'Footer menu'
+	) );
+
+	/*- Logo -*/
+	register_sidebar( array(
+		'name'          => 'Logotip',
+		'id'            => 'logo',
+	) );
+
+	add_theme_support( 'custom-logo', array(
+		'height'      => 100,
+		'width'       => 400,
+		'flex-height' => true,
+		'flex-width'  => true
+	) );
+
+	add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'custom-background' );
+}
+
+//-- Добавить параметр в кастомайзер
+function any_name($wp_customize){
+
+	$wp_customize->add_section('id_name', array(
+		'title'=> __('Реклама', 'fragrance'),
+		'priority' => 30,
+	));
+
+	$wp_customize->add_setting('any_code', array(
+		'default'=>'',
+		'transport'=>'postMEssage',
+	));
+
+	$wp_customize->add_control(new WP_Customize_Control($wp_customize, 'any_code', array(
+		'label'=> __('Ваш Рекламный код', 'fragrance'),
+		'section'=> 'id_name',
+		'settings'=> 'any_code',
+		'type'=> 'textarea',
+	)));
+}
+add_action('customize_register', 'any_name');
+// <?php echo get_theme_mod('any_code'); ?>
+
+*******
+END Function.php
+********
+
+--------------------------------------------------
+
+*******
+Code
+*********
+
+== Header
+
+== Html
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title><?php wp_title( '|', true, 'right' ); bloginfo( 'name' ); ?></title>
+  
+
+== Menu
+  <?php if( has_nav_menu('top') ){
+							
+  wp_nav_menu( array(
+    'theme_location'  => 'top',
+    'menu'            => 'Header menu',
+    'container'  => 'nav',
+    'container_class'  => 'main-mnu',
+  ) );
+  } ?>
+  
+== Logo
+  <?php 
+  $custom_logo_id = get_theme_mod( 'custom_logo' );
+  $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+  ?>
+  <a href="<?php echo home_url("/"); ?>"><img src="<?php echo $image[0]; ?>" alt=""></a>
+  
+  
+== Home Page  
+  <?php if ((is_front_page()) and (!is_paged())) { ?>
+			<?php echo do_shortcode(''); ?>
+	<?php } ?>
+
+== End Header ==
+
+
+
+
+<?php $loop = new WP_Query( array('post_type' => '') ); ?> 
+   <?php while ( $loop->have_posts() ) : $loop->the_post(); ?>
+
+   <?php the_title(''); ?>
+    <?php the_content(''); ?>
+
+  <?php endwhile; ?>
+<?php wp_reset_query();?>
+
+
+== ACF 
+<?php if( array(get_field("day"), get_field("work_time") )  ): ?>
+  <p><?php the_field('day'); ?> <span><?php the_field('work_time'); ?></span></p>
+<?php endif; ?>	
+
+
+<?php if ( get_the_post_thumbnail() ) { ?>
+  <?php echo get_the_post_thumbnail(); ?>
+<?php } ?>
+
+
+<?php echo get_cat_name(7); ?>
+
+
