@@ -143,4 +143,9 @@ Code
 
 <?php echo get_cat_name(7); ?>
 
-
+=== Вывод заголовка категории
+<p><?php $cur_terms = get_the_terms( $post->ID, 'home_categories' );
+foreach( $cur_terms as $cur_term ){
+			echo $cur_term->name;
+	} ?>
+</p>
