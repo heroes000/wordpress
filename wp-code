@@ -149,3 +149,8 @@ foreach( $cur_terms as $cur_term ){
 			echo $cur_term->name;
 	} ?>
 </p>
+
+=============================================
+
+разплывчатый задний фон 
+https://stackoverflow.com/questions/28975673/how-to-blurcss-div-without-blur-child-element
