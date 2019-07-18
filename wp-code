@@ -1,156 +1,126 @@
-*******
-Function.php
-*********
+начало работы
 
-/**
- * Enqueue scripts and styles.
- */
-function fragrance_scripts() {
-	wp_enqueue_script( 'fragrance-bootstrap.min', get_template_directory_uri() . '/libs/bootstrap/js/bootstrap.min.js', array(), '1.0', false);
-}
-add_action( 'wp_enqueue_scripts', 'fragrance_scripts' );
+/wla-interns/pushenko/khba/wp-content/themes
+- sftp-config.json - для загрузки проекта
+- bs-config.js - для отслеживания изменений
 
-function fragrance_style() {
-	wp_enqueue_style( 'fragrance-bootstrap-4', get_template_directory_uri().'/libs/bootstrap-4.0.0/css/bootstrap.css', array(), 'v4.0.0', 'all' );
-}
-add_action( 'wp_enqueue_scripts', 'fragrance_style' );
+_foundation-suctom.scss - после изменения запустить npm run build:fn
 
-/* JQuery */
-add_action( 'wp_enqueue_scripts', 'my_scripts_method' );
-	function my_scripts_method(){
-		wp_enqueue_script( 'jquery' );
-}
+_repeatable-blocks.scss - стили повторяющейся блока
 
-add_action( 'init', 'fragrance_setup' );
-function fragrance_setup() {
-	
-	/*-- Menu --*/
-	register_nav_menus( array(
-		'top' => 'Header menu',
-		'footer' => 'Footer menu'
-	) );
 
-	/*- Logo -*/
-	register_sidebar( array(
-		'name'          => 'Logotip',
-		'id'            => 'logo',
-	) );
-
-	add_theme_support( 'custom-logo', array(
-		'height'      => 100,
-		'width'       => 400,
-		'flex-height' => true,
-		'flex-width'  => true
-	) );
-
-	add_theme_support( 'post-thumbnails' );
-	add_theme_support( 'custom-background' );
-}
-
-//-- Добавить параметр в кастомайзер
-function any_name($wp_customize){
-
-	$wp_customize->add_section('id_name', array(
-		'title'=> __('Реклама', 'fragrance'),
-		'priority' => 30,
-	));
-
-	$wp_customize->add_setting('any_code', array(
-		'default'=>'',
-		'transport'=>'postMEssage',
-	));
-
-	$wp_customize->add_control(new WP_Customize_Control($wp_customize, 'any_code', array(
-		'label'=> __('Ваш Рекламный код', 'fragrance'),
-		'section'=> 'id_name',
-		'settings'=> 'any_code',
-		'type'=> 'textarea',
-	)));
-}
-add_action('customize_register', 'any_name');
-// <?php echo get_theme_mod('any_code'); ?>
-
-*******
-END Function.php
-********
-
---------------------------------------------------
-
-*******
-Code
-*********
-
-== Header
-
-== Html
-<!doctype html>
-<html <?php language_attributes(); ?>>
-<head>
-	<meta charset="<?php bloginfo( 'charset' ); ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title><?php wp_title( '|', true, 'right' ); bloginfo( 'name' ); ?></title>
-  
-
-== Menu
-  <?php if( has_nav_menu('top') ){
-							
-  wp_nav_menu( array(
-    'theme_location'  => 'top',
-    'menu'            => 'Header menu',
-    'container'  => 'nav',
-    'container_class'  => 'main-mnu',
-  ) );
-  } ?>
-  
-== Logo
-  <?php 
-  $custom_logo_id = get_theme_mod( 'custom_logo' );
-  $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-  ?>
-  <a href="<?php echo home_url("/"); ?>"><img src="<?php echo $image[0]; ?>" alt=""></a>
-  
-  
-== Home Page  
-  <?php if ((is_front_page()) and (!is_paged())) { ?>
-			<?php echo do_shortcode(''); ?>
-	<?php } ?>
-
-== End Header ==
+-- Тернарный оператор (if=?  else=:)
+<?php echo $link ? '<a href="<?php echo $link; ?>">' : ''; ?>
+	<?php echo wp_get_attachment_image($image['id'], 'medium', false, array()); ?>
+<?php echo $link ? '</a">' : ''; ?>
 
 
 
+***********Проверка***************
 
-<?php $loop = new WP_Query( array('post_type' => '') ); ?> 
-   <?php while ( $loop->have_posts() ) : $loop->the_post(); ?>
+<?php if($ = get_field('')): ?>
+	<?php echo $; ?>
+<?php endif; ?>
 
-   <?php the_title(''); ?>
-    <?php the_content(''); ?>
-
-  <?php endwhile; ?>
-<?php wp_reset_query();?>
-
-
-== ACF 
-<?php if( array(get_field("day"), get_field("work_time") )  ): ?>
-  <p><?php the_field('day'); ?> <span><?php the_field('work_time'); ?></span></p>
-<?php endif; ?>	
+<?php if( has_post_thumbnail( )):
+	the_post_thumbnail( );
+endif; ?>
 
 
-<?php if ( get_the_post_thumbnail() ) { ?>
-  <?php echo get_the_post_thumbnail(); ?>
-<?php } ?>
+***** Repeater ***********
+<?php if (have_rows('social_link', 'options')): ?>
+
+  <ul class="social__list">
+
+	  <?php  while (have_rows('social_link', 'options')): the_row(); ?>
+
+			  <li>
+				  <a class="" href="<?php the_sub_field('link'); ?>" target="_blank" >
+					  <span class="fab fa-<?php the_sub_field('icon'); ?>"></span>
+				  </a>
+			  </li>
+
+	  <?php endwhile; ?>
+  </ul>
+<?php endif;?>
 
 
-<?php echo get_cat_name(7); ?>
+************* Img  *******************
 
-=== Вывод заголовка категории
-<p><?php $cur_terms = get_the_terms( $post->ID, 'home_categories' );
+<?php if( $image = get_field('builders_img') ): ?>
+<?php echo wp_get_attachment_image($image['id'], 'full'); ?>
+<?php endif; ?>
+
+<?php the_post_thumbnail( $id, 'thumbnail', array('class' => 'alignleft') ); ?>
+
+Данная функция позволяет получить ссылку на миниатюру записи определенного поста в указанном размере
+$image = get_attached_img_url( get_the_ID(), ‘medium’ );
+<img src=”<?php echo $image; ?>” />
+
+-- bg img 
+bg($img , $size = '')
+Использование данной функции позволяет сократить код при выводе картинки в качестве бекгрануда
+$img - массив картинки, полученный из ACF типа image
+$size - thumbnail, medium, medium_large, large, full
+
+$img = get_field(‘image’);
+<div class=”bgcover” <?php bg($img, ‘large’); ?> ></div>
+
+$img = get_field(‘image’);
+<div class=”bgcover” style=”background-image: url(<?php echo $img[‘sizes’][‘large’]; ?>)” ></div>
+
+--- SVG
+display_svg( $img, $class = '', $size = 'medium' ) - отображает содержимое свг картинки в виде HTML (<svg><path /></svg>) для дальнейшей манипуляции с картинкой, например менять заливку при ховере, либо удалять часть изображения.
+$img - массив картинки, полученный из ACF типа image
+$class - класс, который добавится тегу img, если в функцию было передано не свг
+$size - размер выводимой картинки, если в функцию было передано не свг
+
+return_svg( $img, $class = '', $size = 'medium' )
+Функция выполняет тоже самое что и display_svg, только она возвращает контент свг файла, а display_svg - выводит (аналогично get_field() и the_field())
+
+
+BG img
+
+<?php $image = get_field('bg_img_guide');
+	if( !empty($image) ): ?>
+
+	<div class="guide__blur"
+	 style="background: url(<?php echo $image['url']; ?>);
+	 background-size: cover;
+	 background-repeat: no-repeat;
+	 background-position: center ;">
+	</div>
+
+<?php endif; ?>
+
+
+******************************************
+--- Название Категории
+<?php $cur_terms = get_the_terms( $post->ID, 'our_homes_category' );
 foreach( $cur_terms as $cur_term ){
-			echo $cur_term->name;
-	} ?>
-</p>
+echo $cur_term->name;
+} ?>
+*********************************
 
-=============================================
 
-разплывчатый задний фон 
-https://stackoverflow.com/questions/28975673/how-to-blurcss-div-without-blur-child-element
+*************************************************
+ Закинуть в папку parts одним файломс помощью функции show_template()  передать в этот файл нужный тайтл и нужный репитер.
+
+<?php show_template('loop-partners', array('title' => get_field('title_sponsors'), 'list' => get_field('repeater_sponsor') )); ?>
+
+<div class="block_title">
+	<?php if( $title ):
+		echo '<h2 class="title-underline">' . $title . '</h2>';
+	endif; ?>
+</div>
+
+<div class="grid-x align-spaced align-bottom">
+	<?php if( $list ):
+		foreach( $list as $item ) {
+			echo $item['link'] ? '<a href="' . $item['link'] . '">' : '';
+				echo $item['image'] ? wp_get_attachment_image( $item['image']['id'], 'medium') : '';
+			echo $item['link'] ? '</a">' : '';
+		} ?>
+	<?php endif; ?>
+</div>
+*********************************************************************
